@@ -1,0 +1,7 @@
+appId: com.example.workletsintegration
+name: ui-to-native
+---
+- runFlow:
+    file: subflows/block-js-thread.yaml
+    env:
+      EXAMPLE: ui-to-native

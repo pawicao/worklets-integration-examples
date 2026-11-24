@@ -1,0 +1,19 @@
+{
+  "name": "worklets-integration-examples",
+  "private": true,
+  "packageManager": "yarn@4.19.0+sha512.2cb9e5a36f7f11f2bc6ff444830d87368d419e0d83b6a0fb6077d3e6fed0f476c9514dff4ba4d84b049bd34ef32954e550f264ad2fbbfebcba6c89e869530bba",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-expo": "58.0.4",
+    "typescript": "6.0.3"
+  }
+}

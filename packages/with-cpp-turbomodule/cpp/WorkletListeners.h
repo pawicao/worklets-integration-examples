@@ -1,0 +1,83 @@
+#pragma once
+
+#include <jsi/jsi.h>
+
+#if __has_include(<worklets/Compat/StableApi.h>)
+
+#include <worklets/Compat/StableApi.h>
+
+#include <memory>
+#include <mutex>
+#include <string_view>
+#include <unordered_map>
+
+static_assert(
+    std::string_view(WORKLETS_STABLE_API_VERSION) == "0.12.1",
+    "Unsupported react-native-worklets version.");
+
+class WorkletListeners {
+ public:
+  int add(
+      facebook::jsi::Runtime &rnRuntime,
+      const facebook::jsi::Object &uiRuntimeHolder,
+      const facebook::jsi::Object &uiSchedulerHolder,
+      const facebook::jsi::Object &worklet) {
+    Listener listener{
+        worklets::getWorkletRuntimeFromHolder(rnRuntime, uiRuntimeHolder),
+        worklets::getUISchedulerFromHolder(rnRuntime, uiSchedulerHolder),
+        worklets::extractSerializable(
+            rnRuntime,
+            facebook::jsi::Value(rnRuntime, worklet),
+            "[with-cpp-turbomodule] The counter listener must be a worklet.",
+            worklets::Serializable::ValueType::WorkletType)};
+    std::lock_guard lock(mutex_);
+    listeners_.emplace(++lastId_, std::move(listener));
+    return lastId_;
+  }
+
+  void remove(int id) {
+    std::lock_guard lock(mutex_);
+    listeners_.erase(id);
+  }
+
+  void dispatch(int count) {
+    std::lock_guard lock(mutex_);
+    for (const auto &[id, listener] : listeners_) {
+      worklets::scheduleOnUI(listener.uiScheduler, [listener, count] {
+        if (auto uiRuntime = listener.uiRuntime.lock()) {
+          worklets::runSyncOnRuntime(uiRuntime, listener.worklet, facebook::jsi::Value(count));
+        }
+      });
+    }
+  }
+
+ private:
+  struct Listener {
+    std::weak_ptr<worklets::WorkletRuntime> uiRuntime;
+    std::shared_ptr<worklets::UIScheduler> uiScheduler;
+    std::shared_ptr<worklets::Serializable> worklet;
+  };
+
+  std::mutex mutex_;
+  int lastId_ = 0;
+  std::unordered_map<int, Listener> listeners_;
+};
+
+#else
+
+class WorkletListeners {
+ public:
+  int add(
+      facebook::jsi::Runtime &rnRuntime,
+      const facebook::jsi::Object & /*uiRuntimeHolder*/,
+      const facebook::jsi::Object & /*uiSchedulerHolder*/,
+      const facebook::jsi::Object & /*worklet*/) {
+    throw facebook::jsi::JSError(rnRuntime, "[with-cpp-turbomodule] Install react-native-worklets to add worklet listeners.");
+  }
+
+  void remove(int /*id*/) {}
+
+  void dispatch(int /*count*/) {}
+};
+
+#endif

@@ -1,0 +1,25 @@
+# with-nitro
+
+A [Nitro](https://nitro.margelo.com) HybridObject sends a native counter to a callback. The callback is a worklet that runs on the UI Runtime.
+
+```ts
+import { useCounter } from 'with-nitro/reanimated';
+
+const count = useCounter(); // SharedValue<number>
+```
+
+## Key files
+
+- [`src/specs/Counter.nitro.ts`](src/specs/Counter.nitro.ts): the HybridObject. `addListener` takes an ordinary callback.
+- [`src/reanimated.ts`](src/reanimated.ts): installs a `Dispatcher` on the UI Runtime, then calls `addListener` from a worklet on the UI Runtime.
+- [`cpp/WorkletsUIDispatcher.hpp`](cpp/WorkletsUIDispatcher.hpp): a Nitro `Dispatcher` for the UI Runtime, made only from the Worklets stable API.
+- [`cpp/HybridCounter.cpp`](cpp/HybridCounter.cpp): the HybridObject and the counter thread.
+- `nitrogen/generated`: code that `yarn nitrogen` generates from the spec.
+
+## Traps that the code handles
+
+- Nitro calls a callback through the `Dispatcher` of the runtime that created the callback. Worklets, Reanimated and Nitro do not install a `Dispatcher` on the UI Runtime, so this package installs one.
+- The `Dispatcher` must exist before the first `addListener` call on the UI Runtime. The install and the `addListener` call both go through `scheduleOnUI`, which runs jobs in order.
+- A typed Nitro method cannot take the UI Runtime holders. `installUIRuntimeDispatcher` is a raw JSI method.
+- On Android, `scheduleOnUI` calls Java. The counter thread attaches to the Java VM with `facebook::jni::ThreadScope`.
+- A HybridObject works inside a worklet, because Nitro registers it as a custom serializable of Worklets.

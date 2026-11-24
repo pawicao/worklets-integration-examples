@@ -1,0 +1,7 @@
+appId: com.example.workletsintegration
+name: with-cpp-turbomodule
+---
+- runFlow:
+    file: subflows/block-js-thread.yaml
+    env:
+      EXAMPLE: with-cpp-turbomodule

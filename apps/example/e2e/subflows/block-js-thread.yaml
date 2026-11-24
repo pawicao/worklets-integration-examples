@@ -1,0 +1,30 @@
+appId: com.example.workletsintegration
+---
+- launchApp:
+    stopApp: true
+- tapOn:
+    id: ${EXAMPLE}
+- extendedWaitUntil:
+    visible:
+      id: shared-value-count
+    timeout: 10000
+- tapOn:
+    id: block-js-thread
+    retryTapIfNoChange: false
+    waitToSettleTimeoutMs: 100
+- copyTextFrom:
+    id: shared-value-count
+- evalScript: ${output.sharedValue = maestro.copiedText}
+- copyTextFrom:
+    id: react-state-count
+- evalScript: ${output.reactState = maestro.copiedText}
+- copyTextFrom:
+    id: shared-value-count
+- assertTrue:
+    condition: ${maestro.copiedText != output.sharedValue}
+    label: The shared value changes while the JS thread is blocked
+- copyTextFrom:
+    id: react-state-count
+- assertTrue:
+    condition: ${maestro.copiedText == output.reactState}
+    label: The React state does not change while the JS thread is blocked
