@@ -32,7 +32,7 @@ class WorkletsUIDispatcher final : public Dispatcher {
 
   void runAsync(std::function<void()> &&function) override {
     worklets::scheduleOnUI(uiScheduler_, [uiRuntime = uiRuntime_, function = std::move(function)] {
-      if (!uiRuntime.expired()) {
+      if (auto runtime = uiRuntime.lock()) {
         function();
       }
     });
