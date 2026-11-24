@@ -7643,8 +7643,6 @@ __metadata:
   peerDependenciesMeta:
     react-native-reanimated:
       optional: true
-    react-native-worklets:
-      optional: true
   languageName: unknown
   linkType: soft
 
@@ -7678,8 +7676,6 @@ __metadata:
     react-native-worklets: "*"
   peerDependenciesMeta:
     react-native-reanimated:
-      optional: true
-    react-native-worklets:
       optional: true
   languageName: unknown
   linkType: soft

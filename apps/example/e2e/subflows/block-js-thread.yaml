@@ -19,14 +19,21 @@ appId: com.example.workletsintegration
     waitToSettleTimeoutMs: 100
 - copyTextFrom:
     id: react-state-count
-- evalScript: ${output.reactState = maestro.copiedText}
+- repeat:
+    times: 5
+    while:
+      true: ${maestro.copiedText != output.reactState}
+    commands:
+      - evalScript: ${output.reactState = maestro.copiedText}
+      - copyTextFrom:
+          id: react-state-count
 - copyTextFrom:
     id: shared-value-count
-- evalScript: ${output.sharedValue = maestro.copiedText}
-- copyTextFrom:
-    id: shared-value-count
-- assertTrue:
-    condition: ${maestro.copiedText != output.sharedValue}
+- extendedWaitUntil:
+    notVisible:
+      id: shared-value-count
+      text: ${maestro.copiedText}
+    timeout: 5000
     label: The shared value changes while the JS thread is blocked
 - copyTextFrom:
     id: react-state-count

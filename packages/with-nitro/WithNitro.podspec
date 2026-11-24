@@ -1,7 +1,6 @@
 require 'json'
 
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
-has_worklets = Pod::Config.instance.podfile.dependencies.any? { |dependency| dependency.name == 'RNWorklets' }
 
 Pod::Spec.new do |s|
   s.name = 'WithNitro'
@@ -19,6 +18,6 @@ Pod::Spec.new do |s|
 
   s.dependency 'React-jsi'
   s.dependency 'React-callinvoker'
-  s.dependency 'RNWorklets' if has_worklets
+  s.dependency 'RNWorklets'
   install_modules_dependencies(s)
 end

@@ -1,7 +1,6 @@
 require 'json'
 
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
-has_worklets = Pod::Config.instance.podfile.dependencies.any? { |dependency| dependency.name == 'RNWorklets' }
 
 Pod::Spec.new do |s|
   s.name = 'WithCppTurbomodule'
@@ -15,6 +14,6 @@ Pod::Spec.new do |s|
   s.source_files = 'cpp/**/*.{h,cpp}', 'ios/**/*.{h,mm}'
   s.pod_target_xcconfig = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'c++20' }
 
-  s.dependency 'RNWorklets' if has_worklets
+  s.dependency 'RNWorklets'
   install_modules_dependencies(s)
 end

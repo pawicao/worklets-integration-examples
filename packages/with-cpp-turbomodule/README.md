@@ -21,4 +21,3 @@ const count = useCounter(); // SharedValue<number>
 - On Android, `scheduleOnUI` calls Java. The counter thread attaches to the Java VM with `facebook::jni::ThreadScope` for its full life. Without it, each call logs "Unable to retrieve jni environment" and the job does not run in time.
 - Each listener keeps a `std::weak_ptr` to the UI Runtime. After a JavaScript reload, old jobs do nothing.
 - A `static_assert` on `WORKLETS_STABLE_API_VERSION` stops the build when the stable API changes.
-- The package is made to build without Worklets: the podspec and `android/CMakeLists.txt` add Worklets only when the app has it, and `WorkletListeners.h` uses `__has_include`. CI does not test this build.

@@ -18,8 +18,10 @@ All packages use the same data source: a native counter that adds 1 about 60 tim
 
 Each package has two entry points:
 
-- `.` is made to work without Worklets and Reanimated. CI does not test an app without them.
-- `./reanimated` gives a shared value. `react-native-worklets` and `react-native-reanimated` are optional peer dependencies.
+- `.` is made to work without Reanimated. CI does not test an app without Reanimated.
+- `./reanimated` gives a shared value. `react-native-reanimated` is an optional peer dependency.
+
+The native code of `with-cpp-turbomodule` and `with-nitro` uses Worklets, so these packages need `react-native-worklets`. In the other packages, `.` is made to work without Worklets.
 
 ## The example app
 
@@ -43,6 +45,8 @@ yarn android # or: yarn ios
 1. Lint and typecheck.
 2. Build a release APK and run the [Maestro](https://maestro.dev) flows in [`apps/example/e2e`](apps/example/e2e) on an Android emulator. Each flow opens one screen, blocks the JS thread, and makes sure that the shared value changes and the React state does not.
 3. Build the iOS app for the simulator.
+
+CI does not test a JavaScript reload, the removal of a listener, or the iOS app at run time.
 
 The tests use Maestro because it reads the screen through Android accessibility. Detox waits until the JS thread is idle, and these tests block the JS thread on purpose.
 

@@ -7,7 +7,5 @@ add_library(WithNitro SHARED src/main/cpp/cpp-adapter.cpp ../cpp/HybridCounter.c
 include(${CMAKE_SOURCE_DIR}/../nitrogen/generated/android/WithNitro+autolinking.cmake)
 include_directories(../cpp)
 
-find_package(react-native-worklets CONFIG)
-if(react-native-worklets_FOUND)
-  target_link_libraries(WithNitro react-native-worklets::worklets)
-endif()
+find_package(react-native-worklets REQUIRED CONFIG)
+target_link_libraries(WithNitro react-native-worklets::worklets)

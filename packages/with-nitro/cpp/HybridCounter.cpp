@@ -7,9 +7,7 @@
 #include <fbjni/fbjni.h>
 #endif
 
-#if __has_include(<worklets/Compat/StableApi.h>)
 #include "WorkletsUIDispatcher.hpp"
-#endif
 
 namespace margelo::nitro::withnitro {
 
@@ -32,13 +30,12 @@ jsi::Value HybridCounter::installUIRuntimeDispatcher(
     jsi::Runtime &rt,
     const jsi::Value & /*thisValue*/,
     const jsi::Value *args,
-    size_t /*count*/) {
-#if __has_include(<worklets/Compat/StableApi.h>)
+    size_t count) {
+  if (count != 2) {
+    throw jsi::JSError(rt, "[with-nitro] installUIRuntimeDispatcher() takes 2 arguments.");
+  }
   WorkletsUIDispatcher::install(rt, args[0].asObject(rt), args[1].asObject(rt));
   return jsi::Value::undefined();
-#else
-  throw jsi::JSError(rt, "[with-nitro] Install react-native-worklets to add worklet listeners.");
-#endif
 }
 
 double HybridCounter::getCount() {

@@ -6,6 +6,7 @@ apps/example/ios/
 apps/example/android/
 packages/*/android/build/
 packages/*/android/.cxx/
+packages/*/ios/build/
 *.tsbuildinfo
 .DS_Store
 .tmp/

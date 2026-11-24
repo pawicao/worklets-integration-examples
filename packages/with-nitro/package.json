@@ -27,9 +27,6 @@
   "peerDependenciesMeta": {
     "react-native-reanimated": {
       "optional": true
-    },
-    "react-native-worklets": {
-      "optional": true
     }
   }
 }

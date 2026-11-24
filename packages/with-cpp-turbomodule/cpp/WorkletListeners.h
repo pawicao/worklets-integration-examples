@@ -2,8 +2,6 @@
 
 #include <jsi/jsi.h>
 
-#if __has_include(<worklets/Compat/StableApi.h>)
-
 #include <worklets/Compat/StableApi.h>
 
 #include <memory>
@@ -71,22 +69,3 @@ class WorkletListeners {
   int lastId_ = 0;
   std::unordered_map<int, Listener> listeners_;
 };
-
-#else
-
-class WorkletListeners {
- public:
-  int add(
-      facebook::jsi::Runtime &rnRuntime,
-      const facebook::jsi::Object & /*uiRuntimeHolder*/,
-      const facebook::jsi::Object & /*uiSchedulerHolder*/,
-      const facebook::jsi::Object & /*worklet*/) {
-    throw facebook::jsi::JSError(rnRuntime, "[with-cpp-turbomodule] Install react-native-worklets to add worklet listeners.");
-  }
-
-  void remove(int /*id*/) {}
-
-  void dispatch(int /*count*/) {}
-};
-
-#endif

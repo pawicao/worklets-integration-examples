@@ -42,7 +42,5 @@ android {
 dependencies {
   implementation 'com.facebook.react:react-android'
   implementation project(':react-native-nitro-modules')
-  if (rootProject.findProject(':react-native-worklets')) {
-    implementation project(':react-native-worklets')
-  }
+  implementation project(':react-native-worklets')
 }
