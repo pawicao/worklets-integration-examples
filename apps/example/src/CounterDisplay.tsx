@@ -10,7 +10,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
-const BLOCK_DURATION_MS = 5000;
+const BLOCK_DURATION_S = 10;
 
 export function CounterDisplay({ count }: { count: SharedValue<number> }) {
   const [reactCount, setReactCount] = useState(0);
@@ -47,13 +47,17 @@ export function CounterDisplay({ count }: { count: SharedValue<number> }) {
         <View style={[styles.bar, { width: `${reactCount % 100}%` }]} />
       </View>
 
-      <Button testID="block-js-thread" title="Block the JS thread for 5 s" onPress={blockJsThread} />
+      <Button
+        testID="block-js-thread"
+        title={`Block the JS thread for ${BLOCK_DURATION_S} s`}
+        onPress={blockJsThread}
+      />
     </View>
   );
 }
 
 function blockJsThread() {
-  const end = Date.now() + BLOCK_DURATION_MS;
+  const end = Date.now() + BLOCK_DURATION_S * 1000;
   while (Date.now() < end) {}
 }
 

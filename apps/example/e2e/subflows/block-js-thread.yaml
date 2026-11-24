@@ -18,11 +18,11 @@ appId: com.example.workletsintegration
     retryTapIfNoChange: false
     waitToSettleTimeoutMs: 100
 - copyTextFrom:
-    id: shared-value-count
-- evalScript: ${output.sharedValue = maestro.copiedText}
-- copyTextFrom:
     id: react-state-count
 - evalScript: ${output.reactState = maestro.copiedText}
+- copyTextFrom:
+    id: shared-value-count
+- evalScript: ${output.sharedValue = maestro.copiedText}
 - copyTextFrom:
     id: shared-value-count
 - assertTrue:
