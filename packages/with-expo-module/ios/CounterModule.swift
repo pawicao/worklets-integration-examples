@@ -59,7 +59,7 @@ public final class CounterModule: Module {
 
   private func runWorklets(with newCount: Int) {
     let worklets = lock.withLock { Array(listeners.values) }
-    guard !worklets.isEmpty, let runtime = appContext?._uiRuntime as? WorkletRuntime else {
+    guard !worklets.isEmpty, let runtime = try? appContext?.uiRuntime as? WorkletRuntime else {
       return
     }
     for worklet in worklets {

@@ -30,7 +30,7 @@ class CounterModule : Module() {
     }
 
     Function("removeWorkletListener") { id: Int ->
-      listeners.remove(id)
+      listeners -= id
     }
 
     OnCreate {

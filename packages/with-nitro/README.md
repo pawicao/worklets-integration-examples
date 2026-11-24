@@ -16,9 +16,9 @@ const count = useCounter(); // SharedValue<number>
 - [`cpp/HybridCounter.cpp`](cpp/HybridCounter.cpp): the HybridObject and the counter thread.
 - `nitrogen/generated`: code that `yarn nitrogen` generates from the spec.
 
-## Traps that the code handles
+## Problems that the code prevents
 
-- Nitro calls a callback through the `Dispatcher` of the runtime that created the callback. Worklets, Reanimated and Nitro do not install a `Dispatcher` on the UI Runtime, so this package installs one. Without it, `addListener` from `runOnUISync` throws an error. From `scheduleOnUI`, Nitro installs its main-thread `Dispatcher`, and the app crashes after a JavaScript reload on iOS and when a C++ thread calls the callback on Android.
+- Nitro calls a callback through the `Dispatcher` of the runtime that created the callback. Worklets, Reanimated and Nitro do not install a `Dispatcher` on the UI Runtime, so this package installs one. This is a workaround: each Nitro library must copy `WorkletsUIDispatcher.hpp` until Nitro or Worklets gives one. Without it, `addListener` from `runOnUISync` throws an error. From `scheduleOnUI`, Nitro installs its main-thread `Dispatcher`, and the app crashes after a JavaScript reload on iOS and when a C++ thread calls the callback on Android.
 - The `Dispatcher` runs a job only while the UI Runtime exists. Jobs that wait in the queue during a JavaScript reload do nothing.
 - The `Dispatcher` must exist before the first `addListener` call on the UI Runtime. The install and the `addListener` call both go through `scheduleOnUI`, which runs jobs in order.
 - A typed Nitro method cannot take the UI Runtime holders. `installUIRuntimeDispatcher` is a raw JSI method.

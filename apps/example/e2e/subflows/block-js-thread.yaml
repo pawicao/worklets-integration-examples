@@ -8,6 +8,11 @@ appId: com.example.workletsintegration
     visible:
       id: shared-value-count
     timeout: 10000
+- extendedWaitUntil:
+    notVisible:
+      id: react-state-count
+      text: '0'
+    timeout: 10000
 - tapOn:
     id: block-js-thread
     retryTapIfNoChange: false

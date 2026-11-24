@@ -14,7 +14,7 @@ const count = useCounter(); // SharedValue<number>
 - [`src/reanimated.ts`](src/reanimated.ts): `useCounter` calls `getCount` from `useFrameCallback`.
 - [`ios/PolledCounter.mm`](ios/PolledCounter.mm) and [`android/.../PolledCounterModule.kt`](android/src/main/java/com/example/polledcounter/PolledCounterModule.kt): an ordinary TurboModule with a synchronous method.
 
-## Traps that the code handles
+## Problems that the code prevents
 
-- A worklet that reads a method from a TurboModule object crashes the app, unless the RN Runtime read that method first. `src/index.ts` reads the method on the RN Runtime and gives only the function to the worklet.
+- A worklet that reads a method from a TurboModule object crashes the app, unless the RN Runtime read that method first. As a workaround, `src/index.ts` reads the method on the RN Runtime and gives only the function to the worklet. Each library that calls a TurboModule from a worklet must do the same.
 - The method runs on the UI thread, at the same time as the counter thread. The counter is atomic.

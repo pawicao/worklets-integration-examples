@@ -18,7 +18,7 @@ All packages use the same data source: a native counter that adds 1 about 60 tim
 
 Each package has two entry points:
 
-- `.` works without Worklets and Reanimated.
+- `.` is made to work without Worklets and Reanimated. CI does not test an app without them.
 - `./reanimated` gives a shared value. `react-native-worklets` and `react-native-reanimated` are optional peer dependencies.
 
 ## The example app

@@ -20,6 +20,8 @@ jobs:
       - run: corepack enable && yarn install --immutable
       - run: yarn lint
       - run: yarn typecheck
+      - name: Check that the Nitro code is up to date
+        run: yarn workspace with-nitro nitrogen && git diff --exit-code
 
   android:
     runs-on: ubuntu-latest

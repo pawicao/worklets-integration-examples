@@ -1,10 +1,7 @@
 require 'json'
 
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
-has_worklets = system(
-  'node', '--eval', "require.resolve('react-native-worklets/package.json')",
-  chdir: __dir__, out: File::NULL, err: File::NULL
-)
+has_worklets = Pod::Config.instance.podfile.dependencies.any? { |dependency| dependency.name == 'RNWorklets' }
 
 Pod::Spec.new do |s|
   s.name = 'WithNitro'

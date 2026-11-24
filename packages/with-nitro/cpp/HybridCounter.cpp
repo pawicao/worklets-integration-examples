@@ -7,6 +7,10 @@
 #include <fbjni/fbjni.h>
 #endif
 
+#if __has_include(<worklets/Compat/StableApi.h>)
+#include "WorkletsUIDispatcher.hpp"
+#endif
+
 namespace margelo::nitro::withnitro {
 
 HybridCounter::HybridCounter()
@@ -15,6 +19,26 @@ HybridCounter::HybridCounter()
 HybridCounter::~HybridCounter() {
   isCounting_ = false;
   counterThread_.join();
+}
+
+void HybridCounter::loadHybridMethods() {
+  HybridCounterSpec::loadHybridMethods();
+  registerHybrids(this, [](Prototype &prototype) {
+    prototype.registerRawHybridMethod("installUIRuntimeDispatcher", 2, &HybridCounter::installUIRuntimeDispatcher);
+  });
+}
+
+jsi::Value HybridCounter::installUIRuntimeDispatcher(
+    jsi::Runtime &rt,
+    const jsi::Value & /*thisValue*/,
+    const jsi::Value *args,
+    size_t /*count*/) {
+#if __has_include(<worklets/Compat/StableApi.h>)
+  WorkletsUIDispatcher::install(rt, args[0].asObject(rt), args[1].asObject(rt));
+  return jsi::Value::undefined();
+#else
+  throw jsi::JSError(rt, "[with-nitro] Install react-native-worklets to add worklet listeners.");
+#endif
 }
 
 double HybridCounter::getCount() {
@@ -53,39 +77,3 @@ void HybridCounter::countUntilStopped() {
 }
 
 } // namespace margelo::nitro::withnitro
-
-#if __has_include(<worklets/Compat/StableApi.h>)
-
-#include "WorkletsUIDispatcher.hpp"
-
-namespace margelo::nitro::withnitro {
-
-void HybridCounter::loadHybridMethods() {
-  HybridCounterSpec::loadHybridMethods();
-  registerHybrids(this, [](Prototype &prototype) {
-    prototype.registerRawHybridMethod("installUIRuntimeDispatcher", 2, &HybridCounter::installUIRuntimeDispatcher);
-  });
-}
-
-jsi::Value HybridCounter::installUIRuntimeDispatcher(
-    jsi::Runtime &rt,
-    const jsi::Value & /*thisValue*/,
-    const jsi::Value *args,
-    size_t /*count*/) {
-  WorkletsUIDispatcher::install(rt, args[0].asObject(rt), args[1].asObject(rt));
-  return jsi::Value::undefined();
-}
-
-} // namespace margelo::nitro::withnitro
-
-#else
-
-namespace margelo::nitro::withnitro {
-
-void HybridCounter::loadHybridMethods() {
-  HybridCounterSpec::loadHybridMethods();
-}
-
-} // namespace margelo::nitro::withnitro
-
-#endif

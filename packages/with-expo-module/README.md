@@ -14,7 +14,7 @@ const count = useCounter(); // SharedValue<number>
 - [`ios/CounterModule.swift`](ios/CounterModule.swift) and [`android/.../CounterModule.kt`](android/src/main/java/com/example/withexpomodule/CounterModule.kt): keep the worklets and run them on each tick.
 - [`package.json`](package.json): the `./reanimated` entry point and the optional peer dependencies.
 
-## Traps that the code handles
+## Problems that the code prevents
 
 - `installOnUIRuntime(getUIRuntimeHolder())` must run once before native code runs a worklet. It makes Expo Modules available on the UI Runtime.
 - Native code runs the worklets on the main thread, because the UI Runtime runs there. The counter ticks on a background thread, so each tick goes to the main thread first.
