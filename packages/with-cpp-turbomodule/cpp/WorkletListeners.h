@@ -10,6 +10,7 @@
 #include <mutex>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 static_assert(
     std::string_view(WORKLETS_STABLE_API_VERSION) == "0.12.1",
@@ -41,8 +42,7 @@ class WorkletListeners {
   }
 
   void dispatch(int count) {
-    std::lock_guard lock(mutex_);
-    for (const auto &[id, listener] : listeners_) {
+    for (const auto &listener : snapshot()) {
       worklets::scheduleOnUI(listener.uiScheduler, [listener, count] {
         if (auto uiRuntime = listener.uiRuntime.lock()) {
           worklets::runSyncOnRuntime(uiRuntime, listener.worklet, facebook::jsi::Value(count));
@@ -57,6 +57,15 @@ class WorkletListeners {
     std::shared_ptr<worklets::UIScheduler> uiScheduler;
     std::shared_ptr<worklets::Serializable> worklet;
   };
+
+  std::vector<Listener> snapshot() {
+    std::lock_guard lock(mutex_);
+    std::vector<Listener> listeners;
+    for (const auto &[id, listener] : listeners_) {
+      listeners.push_back(listener);
+    }
+    return listeners;
+  }
 
   std::mutex mutex_;
   int lastId_ = 0;
