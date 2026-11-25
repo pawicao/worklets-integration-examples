@@ -1,4 +1,4 @@
-import { installOnUIRuntime, type EventSubscription } from 'expo';
+import { installOnUIRuntime } from 'expo';
 import { useEffect } from 'react';
 import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 import { createSerializable, getUIRuntimeHolder, isWorkletFunction } from 'react-native-worklets';
@@ -7,12 +7,12 @@ import NativeCounter from './NativeCounter';
 
 let isInstalledOnUIRuntime = false;
 
-export function addCounterWorkletListener(worklet: (count: number) => void): EventSubscription {
+export function addCounterWorkletListener(worklet: (count: number) => void): { remove(): void } {
   const id = NativeCounter.addWorkletListener(prepareWorklet(worklet));
   return { remove: () => NativeCounter.removeWorkletListener(id) };
 }
 
-export function addCounterFrameWorkletListener(worklet: (count: number) => void): EventSubscription {
+export function addCounterFrameWorkletListener(worklet: (count: number) => void): { remove(): void } {
   const id = NativeCounter.addFrameWorkletListener(prepareWorklet(worklet));
   return { remove: () => NativeCounter.removeFrameWorkletListener(id) };
 }
@@ -26,7 +26,7 @@ export function useCounterOnEachFrame(): SharedValue<number> {
 }
 
 function useCounterFrom(
-  addListener: (worklet: (count: number) => void) => EventSubscription
+  addListener: (worklet: (count: number) => void) => { remove(): void }
 ): SharedValue<number> {
   const count = useSharedValue(NativeCounter.getCount);
 
