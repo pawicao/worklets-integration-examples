@@ -14,7 +14,7 @@ The Worklets guide [Sending native data to the UI Runtime](https://docs.swmansio
 | [`with-view-event`](packages/with-view-event)           | A native view            | A Fabric event and a Reanimated event handler         |
 | [`ui-to-native`](packages/ui-to-native)                 | A TurboModule method     | A worklet on the UI Runtime that calls the method     |
 
-All packages use the same data source: a native counter that adds 1 about 60 times each second. The first four packages count on a background thread and send each value. In `ui-to-native`, a worklet reads the value once per frame.
+All packages use the same data source: a native counter that adds 1 about 60 times each second. The first four packages count on a background thread and send each value. The exception is `with-view-event` on iOS: it adds 1 on the main thread, because Reanimated ignores view events from other threads. In `ui-to-native`, a worklet reads the value once per frame.
 
 Each package has two entry points:
 
@@ -25,7 +25,7 @@ The native code of `with-cpp-turbomodule` and `with-nitro` uses Worklets, so the
 
 ## The example app
 
-[`apps/example`](apps/example) is an Expo app with a development build. It has one screen for each package. Each screen shows the counter two times: as a shared value that the UI thread updates, and as React state that the JS thread updates. The button "Block the JS thread for 10 s" stops the JS thread. During the block, the shared value continues to change and the React state stops.
+[`apps/example`](apps/example) is an Expo app with a development build. It has six screens: one for each package, and a second Expo screen that reads the value on each frame. Each screen shows the counter two times: as a shared value that the UI thread updates, and as React state that the JS thread updates. The button "Block the JS thread for 10 s" stops the JS thread. During the block, the shared value continues to change and the React state stops.
 
 ## Run the app
 

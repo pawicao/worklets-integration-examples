@@ -10,8 +10,8 @@ const count = useCounter(); // SharedValue<number>
 
 ## Key files
 
-- [`src/reanimated.ts`](src/reanimated.ts): `addCounterWorkletListener` gives a worklet to native code. `useCounter` builds a shared value on it.
-- [`ios/CounterModule.swift`](ios/CounterModule.swift) and [`android/.../CounterModule.kt`](android/src/main/java/com/example/withexpomodule/CounterModule.kt): keep the worklets and run them on each tick.
+- [`src/reanimated.ts`](src/reanimated.ts): `addCounterWorkletListener` gives a worklet to native code. `useCounter` builds a shared value on it. `addCounterFrameWorkletListener` and `useCounterOnEachFrame` do the same, but native code reads the counter on each frame.
+- [`ios/CounterModule.swift`](ios/CounterModule.swift) and [`android/.../CounterModule.kt`](android/src/main/java/com/example/withexpomodule/CounterModule.kt): keep the worklets and run them on each tick, or on each frame for the frame listeners.
 - [`package.json`](package.json): the `./reanimated` entry point and the optional peer dependencies.
 
 ## Problems that the code prevents

@@ -13,7 +13,7 @@ const count = useCounter(); // SharedValue<number>
 - [`src/reanimated.ts`](src/reanimated.ts): gives the UI Runtime holder, the UI scheduler holder and the serialized worklet to native code.
 - [`cpp/WorkletListeners.h`](cpp/WorkletListeners.h): keeps the worklets and runs them on the UI Runtime.
 - [`cpp/CppCounter.cpp`](cpp/CppCounter.cpp): the TurboModule and the counter thread.
-- [`react-native.config.js`](react-native.config.js) (Android) and `codegenConfig.ios.modules` in [`package.json`](package.json) (iOS): register a C++ TurboModule without Java or Objective-C code. [`ios/CppCounterProvider.mm`](ios/CppCounterProvider.mm) creates the module on iOS.
+- [`react-native.config.js`](react-native.config.js) (Android) and `codegenConfig.ios.modules` in [`package.json`](package.json) (iOS): register the C++ TurboModule. Android needs no Java or Kotlin code. On iOS, the Objective-C++ provider [`ios/CppCounterProvider.mm`](ios/CppCounterProvider.mm) creates the module.
 
 ## Problems that the code prevents
 
