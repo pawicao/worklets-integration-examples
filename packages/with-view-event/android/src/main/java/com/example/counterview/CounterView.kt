@@ -34,7 +34,7 @@ class CounterView(private val reactContext: ThemedReactContext) : View(reactCont
 
   private class CountEvent(surfaceId: Int, viewId: Int, private val count: Int) :
     Event<CountEvent>(surfaceId, viewId) {
-    override fun getEventName() = "topCount"
+    override fun getEventName() = "onCount"
 
     override fun getEventData() = Arguments.createMap().apply { putInt("count", count) }
   }

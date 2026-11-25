@@ -18,7 +18,7 @@ class CounterViewManager : SimpleViewManager<CounterView>(), CounterViewManagerI
   override fun createViewInstance(context: ThemedReactContext) = CounterView(context)
 
   override fun getExportedCustomDirectEventTypeConstants() =
-    mapOf("topCount" to mapOf("registrationName" to "onCount"))
+    mapOf("onCount" to mapOf("registrationName" to "onCount"))
 
   companion object {
     const val NAME = "CounterView"
