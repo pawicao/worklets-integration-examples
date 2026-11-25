@@ -18,6 +18,6 @@ const count = useCounter(); // SharedValue<number>
 ## Problems that the code prevents
 
 - The native method takes `jsi::Object` arguments. A Java or Objective-C TurboModule converts the holders to empty maps.
-- On Android, `scheduleOnUI` calls Java. The counter thread attaches to the Java VM with `facebook::jni::ThreadScope` for its full life. Without it, each call logs "Unable to retrieve jni environment" and the job does not run in time.
+- On Android, `scheduleOnUI` calls Java. The counter thread attaches to the Java VM with `facebook::jni::ThreadScope` for its full life. Without it, `scheduleOnUI` throws, and the job waits until other work on the UI thread runs it.
 - Each listener keeps a `std::weak_ptr` to the UI Runtime. After a JavaScript reload, old jobs do nothing.
 - A `static_assert` on `WORKLETS_STABLE_API_VERSION` stops the build when the stable API changes.
