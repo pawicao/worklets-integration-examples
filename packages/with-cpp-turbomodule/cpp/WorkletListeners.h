@@ -41,9 +41,9 @@ class WorkletListeners {
 
   void dispatch(int count) {
     for (const auto &listener : snapshot()) {
-      worklets::scheduleOnUI(listener.uiScheduler, [listener, count] {
-        if (auto uiRuntime = listener.uiRuntime.lock()) {
-          worklets::runSyncOnRuntime(uiRuntime, listener.worklet, facebook::jsi::Value(count));
+      worklets::scheduleOnUI(listener.uiScheduler, [uiRuntime = listener.uiRuntime, worklet = listener.worklet, count] {
+        if (auto runtime = uiRuntime.lock()) {
+          worklets::runSyncOnRuntime(runtime, worklet, facebook::jsi::Value(count));
         }
       });
     }
