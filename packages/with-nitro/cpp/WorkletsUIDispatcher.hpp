@@ -18,11 +18,14 @@ class WorkletsUIDispatcher final : public Dispatcher {
   static void install(jsi::Runtime &rnRuntime, const jsi::Object &uiRuntimeHolder, const jsi::Object &uiSchedulerHolder) {
     std::weak_ptr<worklets::WorkletRuntime> uiRuntime = worklets::getWorkletRuntimeFromHolder(rnRuntime, uiRuntimeHolder);
     auto uiScheduler = worklets::getUISchedulerFromHolder(rnRuntime, uiSchedulerHolder);
-    worklets::scheduleOnUI(uiScheduler, [uiRuntime, uiScheduler] {
-      if (auto runtime = uiRuntime.lock()) {
+    std::weak_ptr<worklets::UIScheduler> weakUIScheduler = uiScheduler;
+    worklets::scheduleOnUI(uiScheduler, [uiRuntime, weakUIScheduler] {
+      auto runtime = uiRuntime.lock();
+      auto scheduler = weakUIScheduler.lock();
+      if (runtime && scheduler) {
         installRuntimeGlobalDispatcher(
             worklets::getJSIRuntimeFromWorkletRuntime(runtime),
-            std::make_shared<WorkletsUIDispatcher>(uiRuntime, uiScheduler));
+            std::make_shared<WorkletsUIDispatcher>(uiRuntime, scheduler));
       }
     });
   }
