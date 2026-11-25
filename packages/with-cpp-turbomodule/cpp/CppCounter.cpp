@@ -21,7 +21,7 @@ double CppCounter::getCount(jsi::Runtime & /*rt*/) {
   return count_;
 }
 
-double CppCounter::addWorkletListener(
+int CppCounter::addWorkletListener(
     jsi::Runtime &rt,
     jsi::Object uiRuntimeHolder,
     jsi::Object uiSchedulerHolder,
@@ -29,8 +29,8 @@ double CppCounter::addWorkletListener(
   return workletListeners_.add(rt, uiRuntimeHolder, uiSchedulerHolder, worklet);
 }
 
-void CppCounter::removeWorkletListener(jsi::Runtime & /*rt*/, double id) {
-  workletListeners_.remove(static_cast<int>(id));
+void CppCounter::removeWorkletListener(jsi::Runtime & /*rt*/, int id) {
+  workletListeners_.remove(id);
 }
 
 void CppCounter::countUntilStopped() {

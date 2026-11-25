@@ -6,8 +6,8 @@ export interface Spec extends TurboModule {
     uiRuntimeHolder: CodegenTypes.UnsafeObject,
     uiSchedulerHolder: CodegenTypes.UnsafeObject,
     worklet: CodegenTypes.UnsafeObject
-  ): number;
-  removeWorkletListener(id: number): void;
+  ): CodegenTypes.Int32;
+  removeWorkletListener(id: CodegenTypes.Int32): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('CppCounter');

@@ -16,12 +16,12 @@ class CppCounter : public NativeCppCounterCxxSpec<CppCounter> {
   ~CppCounter() override;
 
   double getCount(jsi::Runtime &rt);
-  double addWorkletListener(
+  int addWorkletListener(
       jsi::Runtime &rt,
       jsi::Object uiRuntimeHolder,
       jsi::Object uiSchedulerHolder,
       jsi::Object worklet);
-  void removeWorkletListener(jsi::Runtime &rt, double id);
+  void removeWorkletListener(jsi::Runtime &rt, int id);
 
  private:
   void countUntilStopped();
