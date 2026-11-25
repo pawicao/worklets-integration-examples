@@ -18,9 +18,9 @@ const count = useCounter(); // SharedValue<number>
 
 ## Problems that the code prevents
 
-- Nitro calls a callback through the `Dispatcher` of the runtime that created the callback. Worklets, Reanimated and Nitro do not install a `Dispatcher` on the UI Runtime, so this package installs one. This is a workaround: each Nitro library must copy `WorkletsUIDispatcher.hpp` until Nitro or Worklets gives one. Without it, `addListener` from `runOnUISync` throws an error. From `scheduleOnUI`, Nitro installs its main-thread `Dispatcher`, and the app crashes after a JavaScript reload on iOS and when a C++ thread calls the callback on Android.
+- Nitro calls a callback through the `Dispatcher` of the runtime that created the callback. Worklets and Reanimated do not install a `Dispatcher` on the UI Runtime, so this package installs one. This is a workaround until Nitro or Worklets gives one. A UI Runtime has one `Dispatcher`. If another library installed one before, the install throws in a debug build of Nitro, and replaces the first one in a release build. Without this install, `addListener` from `runOnUISync` throws an error. From `scheduleOnUI`, Nitro installs its main-thread `Dispatcher`, and the app crashes after a JavaScript reload on iOS and when a C++ thread calls the callback on Android.
 - The `Dispatcher` runs a job only while the UI Runtime exists. Jobs that wait in the queue during a JavaScript reload do nothing.
 - The `Dispatcher` must exist before the first `addListener` call on the UI Runtime. The install and the `addListener` call both go through `scheduleOnUI`, which runs jobs in order.
-- A typed Nitro method cannot take the UI Runtime holders. `installUIRuntimeDispatcher` is a raw JSI method.
+- `installUIRuntimeDispatcher` gets the UI Runtime holders. The example uses a raw JSI method for it.
 - On Android, `scheduleOnUI` calls Java. The counter thread attaches to the Java VM with `facebook::jni::ThreadScope`.
 - A HybridObject works inside a worklet, because Nitro registers it as a custom serializable of Worklets.
