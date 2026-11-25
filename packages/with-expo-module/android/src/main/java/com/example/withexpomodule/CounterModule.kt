@@ -90,6 +90,10 @@ class CounterModule : Module() {
   }
 
   private fun runFrameWorklets() {
+    if (frameListeners.isEmpty()) {
+      isPostingFrames = false
+      return
+    }
     val runtime = appContext.uiRuntime
     val currentCount = count.get()
     frameListeners.values.forEach { it.execute(runtime, currentCount) }
