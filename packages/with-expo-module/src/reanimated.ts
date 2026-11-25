@@ -8,6 +8,40 @@ import NativeCounter from './NativeCounter';
 let isInstalledOnUIRuntime = false;
 
 export function addCounterWorkletListener(worklet: (count: number) => void): EventSubscription {
+  const id = NativeCounter.addWorkletListener(prepareWorklet(worklet));
+  return { remove: () => NativeCounter.removeWorkletListener(id) };
+}
+
+export function addCounterFrameWorkletListener(worklet: (count: number) => void): EventSubscription {
+  const id = NativeCounter.addFrameWorkletListener(prepareWorklet(worklet));
+  return { remove: () => NativeCounter.removeFrameWorkletListener(id) };
+}
+
+export function useCounter(): SharedValue<number> {
+  return useCounterFrom(addCounterWorkletListener);
+}
+
+export function useCounterOnEachFrame(): SharedValue<number> {
+  return useCounterFrom(addCounterFrameWorkletListener);
+}
+
+function useCounterFrom(
+  addListener: (worklet: (count: number) => void) => EventSubscription
+): SharedValue<number> {
+  const count = useSharedValue(NativeCounter.getCount);
+
+  useEffect(() => {
+    const subscription = addListener((newCount) => {
+      'worklet';
+      count.set(newCount);
+    });
+    return () => subscription.remove();
+  }, [addListener, count]);
+
+  return count;
+}
+
+function prepareWorklet(worklet: (count: number) => void): object {
   if (!isWorkletFunction(worklet)) {
     throw new Error("The counter listener must be a worklet. Add the 'worklet' directive.");
   }
@@ -15,20 +49,5 @@ export function addCounterWorkletListener(worklet: (count: number) => void): Eve
     installOnUIRuntime(getUIRuntimeHolder());
     isInstalledOnUIRuntime = true;
   }
-  const id = NativeCounter.addWorkletListener(createSerializable(worklet));
-  return { remove: () => NativeCounter.removeWorkletListener(id) };
-}
-
-export function useCounter(): SharedValue<number> {
-  const count = useSharedValue(NativeCounter.getCount);
-
-  useEffect(() => {
-    const subscription = addCounterWorkletListener((newCount) => {
-      'worklet';
-      count.set(newCount);
-    });
-    return () => subscription.remove();
-  }, [count]);
-
-  return count;
+  return createSerializable(worklet);
 }

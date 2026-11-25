@@ -7,6 +7,8 @@ public final class CounterModule: Module {
   private var lastListenerId = 0
   private var listeners: [Int: Worklet] = [:]
   private var timer: DispatchSourceTimer?
+  private var frameListeners: [Int: Worklet] = [:]
+  private var displayLink: CADisplayLink?
 
   public func definition() -> ModuleDefinition {
     Name("WithExpoModuleCounter")
@@ -27,13 +29,38 @@ public final class CounterModule: Module {
       lock.withLock { listeners[id] = nil }
     }
 
+    Function("addFrameWorkletListener") { (worklet: Worklet) -> Int in
+      let id = lock.withLock {
+        lastListenerId += 1
+        frameListeners[lastListenerId] = worklet
+        return lastListenerId
+      }
+      DispatchQueue.main.async { [weak self] in
+        self?.updateDisplayLink()
+      }
+      return id
+    }
+
+    Function("removeFrameWorkletListener") { (id: Int) in
+      lock.withLock { frameListeners[id] = nil }
+      DispatchQueue.main.async { [weak self] in
+        self?.updateDisplayLink()
+      }
+    }
+
     OnCreate {
       startCounter()
     }
 
     OnDestroy {
       timer?.cancel()
-      lock.withLock { listeners.removeAll() }
+      lock.withLock {
+        listeners.removeAll()
+        frameListeners.removeAll()
+      }
+      DispatchQueue.main.async { [weak self] in
+        self?.updateDisplayLink()
+      }
     }
   }
 
@@ -65,5 +92,46 @@ public final class CounterModule: Module {
     for worklet in worklets {
       worklet.execute(on: runtime, arguments: [newCount])
     }
+  }
+
+  private func updateDisplayLink() {
+    let shouldRun = lock.withLock { !frameListeners.isEmpty }
+    if shouldRun, displayLink == nil {
+      let target = DisplayLinkTarget { [weak self] displayLink in
+        guard let self else {
+          displayLink.invalidate()
+          return
+        }
+        self.runFrameWorklets()
+      }
+      let displayLink = CADisplayLink(target: target, selector: #selector(DisplayLinkTarget.onFrame(_:)))
+      displayLink.add(to: .main, forMode: .common)
+      self.displayLink = displayLink
+    } else if !shouldRun {
+      displayLink?.invalidate()
+      displayLink = nil
+    }
+  }
+
+  private func runFrameWorklets() {
+    let (currentCount, worklets) = lock.withLock { (count, Array(frameListeners.values)) }
+    guard let runtime = try? appContext?.uiRuntime as? WorkletRuntime else {
+      return
+    }
+    for worklet in worklets {
+      worklet.execute(on: runtime, arguments: [currentCount])
+    }
+  }
+}
+
+private final class DisplayLinkTarget: NSObject {
+  private let frame: (CADisplayLink) -> Void
+
+  init(_ frame: @escaping (CADisplayLink) -> Void) {
+    self.frame = frame
+  }
+
+  @objc func onFrame(_ displayLink: CADisplayLink) {
+    frame(displayLink)
   }
 }

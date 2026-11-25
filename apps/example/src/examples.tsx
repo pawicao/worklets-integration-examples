@@ -2,7 +2,10 @@ import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { useCounter as useUiToNativeCounter } from 'ui-to-native/reanimated';
 import { useCounter as useCppTurboModuleCounter } from 'with-cpp-turbomodule/reanimated';
-import { useCounter as useExpoModuleCounter } from 'with-expo-module/reanimated';
+import {
+  useCounter as useExpoModuleCounter,
+  useCounterOnEachFrame as useExpoModuleCounterOnEachFrame,
+} from 'with-expo-module/reanimated';
 import { useCounter as useNitroCounter } from 'with-nitro/reanimated';
 import { AnimatedCounterView, useCountHandler } from 'with-view-event/reanimated';
 
@@ -10,6 +13,11 @@ import { CounterDisplay } from './CounterDisplay';
 
 export const examples = [
   { id: 'with-expo-module', title: 'Expo module', Screen: ExpoModuleExample },
+  {
+    id: 'with-expo-module-frames',
+    title: 'Expo module, read on each frame',
+    Screen: ExpoModuleFramesExample,
+  },
   { id: 'with-cpp-turbomodule', title: 'C++ TurboModule', Screen: CppTurboModuleExample },
   { id: 'with-nitro', title: 'Nitro module', Screen: NitroExample },
   { id: 'with-view-event', title: 'View event', Screen: ViewEventExample },
@@ -18,6 +26,10 @@ export const examples = [
 
 function ExpoModuleExample() {
   return <CounterDisplay count={useExpoModuleCounter()} />;
+}
+
+function ExpoModuleFramesExample() {
+  return <CounterDisplay count={useExpoModuleCounterOnEachFrame()} />;
 }
 
 function CppTurboModuleExample() {

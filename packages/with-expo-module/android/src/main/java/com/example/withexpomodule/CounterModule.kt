@@ -2,6 +2,7 @@ package com.example.withexpomodule
 
 import android.os.Handler
 import android.os.Looper
+import android.view.Choreographer
 import expo.modules.kotlin.jni.worklets.Worklet
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -17,6 +18,9 @@ class CounterModule : Module() {
   private val listeners = ConcurrentHashMap<Int, Worklet>()
   private val mainHandler = Handler(Looper.getMainLooper())
   private var counterThread: ScheduledExecutorService? = null
+  private val frameListeners = ConcurrentHashMap<Int, Worklet>()
+  private var isPostingFrames = false
+  private val frameCallback = Choreographer.FrameCallback { runFrameWorklets() }
 
   override fun definition() = ModuleDefinition {
     Name("WithExpoModuleCounter")
@@ -33,6 +37,18 @@ class CounterModule : Module() {
       listeners -= id
     }
 
+    Function("addFrameWorkletListener") { worklet: Worklet ->
+      lastListenerId.incrementAndGet().also {
+        frameListeners[it] = worklet
+        mainHandler.post(::updateFrameCallback)
+      }
+    }
+
+    Function("removeFrameWorkletListener") { id: Int ->
+      frameListeners -= id
+      mainHandler.post(::updateFrameCallback)
+    }
+
     OnCreate {
       counterThread = Executors.newSingleThreadScheduledExecutor().apply {
         scheduleAtFixedRate(::tick, 0, 16, TimeUnit.MILLISECONDS)
@@ -42,6 +58,8 @@ class CounterModule : Module() {
     OnDestroy {
       counterThread?.shutdownNow()
       listeners.clear()
+      frameListeners.clear()
+      mainHandler.post(::updateFrameCallback)
     }
   }
 
@@ -56,5 +74,25 @@ class CounterModule : Module() {
     }
     val runtime = appContext.uiRuntime
     listeners.values.forEach { it.execute(runtime, newCount) }
+  }
+
+  private fun updateFrameCallback() {
+    val shouldPostFrames = frameListeners.isNotEmpty()
+    if (shouldPostFrames == isPostingFrames) {
+      return
+    }
+    isPostingFrames = shouldPostFrames
+    if (shouldPostFrames) {
+      Choreographer.getInstance().postFrameCallback(frameCallback)
+    } else {
+      Choreographer.getInstance().removeFrameCallback(frameCallback)
+    }
+  }
+
+  private fun runFrameWorklets() {
+    val runtime = appContext.uiRuntime
+    val currentCount = count.get()
+    frameListeners.values.forEach { it.execute(runtime, currentCount) }
+    Choreographer.getInstance().postFrameCallback(frameCallback)
   }
 }

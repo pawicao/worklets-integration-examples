@@ -1,0 +1,7 @@
+appId: com.example.workletsintegration
+name: with-expo-module-frames
+---
+- runFlow:
+    file: subflows/block-js-thread.yaml
+    env:
+      EXAMPLE: with-expo-module-frames
